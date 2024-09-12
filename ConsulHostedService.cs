@@ -1,9 +1,4 @@
 ﻿using Consul;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 public class ConsulHostedService : IHostedService
 {
@@ -20,19 +15,19 @@ public class ConsulHostedService : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        // Retrieve port from configuration
+        // Retrieve port from configuration, default to 5001 if null
         var servicePortString = _configuration["ConsulConfig:ServicePort"];
         var servicePort = int.TryParse(servicePortString, out var port) ? port : 5001;
 
         var registration = new AgentServiceRegistration
         {
             ID = _serviceId,
-            Name = _configuration["ConsulConfig:ServiceName"] ?? "UserService",
+            Name = _configuration["ConsulConfig:ServiceName"] ?? "UserService", // Fallback to "UserService" if null
             Address = "localhost",
             Port = servicePort,
             Check = new AgentServiceCheck
             {
-                HTTP = $"http://localhost:{servicePort}/api/health",
+                HTTP = $"http://localhost:{servicePort}/api/health", // Use the dynamically retrieved port
                 Interval = TimeSpan.FromSeconds(10),
                 Timeout = TimeSpan.FromSeconds(5)
             }

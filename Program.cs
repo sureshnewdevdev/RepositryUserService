@@ -4,10 +4,6 @@ using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Determine the current environment
-var environment = builder.Environment.EnvironmentName;
-Console.WriteLine($"Current Environment: {environment}");
-
 // Add Consul client to the service container
 builder.Services.AddSingleton<IConsulClient, ConsulClient>(p => new ConsulClient(consulConfig =>
 {
@@ -33,7 +29,7 @@ Console.WriteLine($"Service is running on port {servicePort}");
 var app = builder.Build();
 
 // Add health check and base route
-app.MapGet("/", () => "UserService is running...");
+app.MapGet("/", () => $"UserService is running on port {servicePort}");
 app.MapGet("/api/health", () => Results.Ok("Service is healthy"));
 
 app.Run();
